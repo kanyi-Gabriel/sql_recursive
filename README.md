@@ -31,15 +31,20 @@ For this day, I explored **advanced database features** such as **triggers** and
 
 ## 💻 Sample Query (Recursive CTE for Employee Hierarchy)
 ```sql
-WITH RECURSIVE EmployeeHierarchy(EmployeeId, Name, Title, ManagerId, Level) AS (
-    SELECT EmployeeId, FirstName || ' ' || LastName, Title, ReportsTo, 1
-    FROM employee
-    WHERE ReportsTo IS NULL
-    UNION ALL
-    SELECT e.EmployeeId, e.FirstName || ' ' || e.LastName, e.Title, e.ReportsTo, eh.Level + 1
-    FROM employee e
-    JOIN EmployeeHierarchy eh ON e.ReportsTo = eh.EmployeeId
-)
-SELECT Name, Title, Level 
-FROM EmployeeHierarchy
-ORDER BY Level;
+SELECT 
+    FirstName || " " || LastName as Customer_Name,
+    sum(i.Total) as Total_spent,
+    CASE 
+        WHEN  sum(i.Total) > 45 THEN  "Platinum"
+        WHEN  sum(i.Total) BETWEEN 40 and 45 THEN  "Gold"
+        ELSE "silver"
+    END as Customer_Tier 
+FROM customers c
+JOIN
+    invoices i
+ON
+    c.CustomerId = i.CustomerId
+GROUP BY c.CustomerId
+ORDER BY Total_spent DESC
+
+
